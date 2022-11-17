@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 function App() {
     const [search, setSearch] = useState("")
     const [results, setResults] = useState([])
     const [searchInfo, setSearchInfo] = useState({})
+    const [loading, setLoading] = useState(false)
 
     const handleSearch = async e => {
         e.preventDefault();
@@ -11,6 +12,7 @@ function App() {
 
         const endpoint = `https://en.wikipedia.org/w/api.php?action=query&list=search&prop=info&inprop=url&utf=8&format=json&origin=*&srlimit=20&srsearch=${search}`;
 
+        setLoading(true);
         const response = await fetch(endpoint);
 
         if (!response.ok) {
@@ -23,6 +25,10 @@ function App() {
         console.log(json.query.search)
         setSearchInfo(json.query.searchinfo);
     }
+
+    useEffect(() => {
+        setLoading(false);
+    }, [results, searchInfo]);
 
 	return (
 		<div className="App">
@@ -37,6 +43,7 @@ function App() {
                     />
                 </form>
                 {(searchInfo.totalhits) ? <p>Search Results: {searchInfo.totalhits}</p> : ""}
+                {(loading) ? <span className="loading"></span> : ""}
             </header>
             <div className="results">
                 {
